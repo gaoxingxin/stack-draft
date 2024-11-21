@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Lot Garage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: black;
+            background-image: url('Images/daybg.gif');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: background-image 0.5s, color 0.5s;
+        }
+
+        :root {
+            --orange-color: rgba(255, 165, 0, 1);
+            --orange-glow: 0 0 15px rgba(255, 165, 0, 0.8);
+            --blue-color: rgba(0, 123, 255, 1);
+            --blue-glow: 0 0 15px rgba(0, 123, 255, 0.8);
+        }
+        
+        #carPlate {
+            font-size: 18px;
+            padding: 10px;
+            width: 70%;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 2px dashed var(--orange-color);
+            background-color: rgba(240, 240, 240, 0.9);
+            box-shadow: var(--orange-glow);
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .night-mode #carPlate {
+            border: 2px dashed var(--blue-color);
+            box-shadow: var(--blue-glow);
+        }
+
+        .checkbox-container label {
+            font-size: 18px; 
+            margin-left: 5px; 
+        }
+
+        .checkbox-container input {
+            transform: scale(1.5); 
+            margin-right: 10px; 
+        }
+
+        button[type="submit"] {
+            font-size: 18px;
+            padding: 10px 20px;
+            border: 2px dashed var(--orange-color);
+            border-radius: 5px;
+            background-color: rgba(240, 240, 240, 0.9);
+            color: black;
+            cursor: pointer;
+            box-shadow: var(--orange-glow);
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            box-shadow: 0 0 20px rgba(255, 165, 0, 1);
+            background-color: rgba(230, 230, 230, 0.9);
+        }
+
+        .night-mode button[type="submit"] {
+            border: 2px dashed var(--blue-color);
+            box-shadow: var(--blue-glow);
+        }
+
+        .night-mode button[type="submit"]:hover {
+            box-shadow: 0 0 20px rgba(0, 123, 255, 1);
+        }
+
+        .error-message {
+            font-size: 16px; 
+            color: red;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .car-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+            
+        }
+
+        .car {
+            width: 150px;
+            height: 90px;
+            border-radius: 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            line-height: 0;
+        }
+
+        .plate-number {
+            position: absolute;
+            bottom: -10px; 
+            width: 100%;
+            text-align: center;
+            padding: 2px;
+            font-size: 14px;
+            border-radius: 5px;
+            color: black;
+        }
+
+        .table-container {
+            width: 100%; 
+            margin-top: 10px; 
+            padding: 0px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%; 
+            border-collapse: collapse;
+            text-align: center;
+            background-color: transparent;
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.8); 
+        }
+
+        table, th, td {
+            border: 2px dashed rgba(255, 165, 0, 0.8); 
+            border-radius: 10px;
+        }
+
+        th, td {
+            padding: 10px; 
+        }
+
+        .night-mode table {
+            box-shadow: var(--blue-glow);
+        }
+
+        .night-mode table, 
+        .night-mode th, 
+        .night-mode td {
+            border: 2px dashed var(--blue-color);
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-top: 20px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #FFA500; 
+            transition: background-color 0.4s, box-shadow 0.4s;
+            border-radius: 34px;
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.8); 
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.4s;
+        }
+
+        input:checked + .slider {
+            background-color: #007BFF; 
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.8); 
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            margin-top: 10px;
+            margin-bottom: 30px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .night-mode {
+            background-color: #1a1a2e;
+            color: #000000;
+        }
+
+        .parking-lot {
+            border: 2px dashed var(--orange-color);
+            padding: 20px;
+            box-shadow: var(--orange-glow);
+        }
+
+        .night-mode .parking-lot {
+            border: 2px dashed var(--blue-color);
+            box-shadow: var(--blue-glow);
+        }
+
+        .checkbox-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; 
+            margin-top: 15px; 
+            margin-bottom: 15px; 
+        }
+
+        .checkbox-container input {
+            -webkit-appearance: none; 
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            margin-right: 10px;
+            border: 2px solid rgba(255, 165, 0, 1); 
+            border-radius: 5px; /* Rounded corners */
+            background-color: rgba(240, 240, 240, 0.9); 
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.9); 
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .checkbox-container input:hover {
+            background-color: rgba(255, 200, 0, 0.9); 
+            border-color: rgba(255, 165, 0, 1); 
+            box-shadow: 0 0 30px rgba(255, 165, 0, 1);
+        }
+
+        .checkbox-container input:checked {
+            background-color: rgba(255, 165, 0, 1); 
+            border-color: rgba(255, 165, 0, 1); 
+            box-shadow: 0 0 40px rgba(255, 165, 0, 1); 
+        }
+
+        .night-mode .checkbox-container input {
+            border-color: rgba(0, 123, 255, 1); 
+            background-color: rgba(240, 240, 255, 0.9); 
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.9);
+        }
+
+        .night-mode .checkbox-container input:hover {
+            background-color: rgba(0, 150, 255, 0.9); 
+            border-color: rgba(0, 123, 255, 1); 
+            box-shadow: 0 0 30px rgba(0, 123, 255, 1); 
+        }
+
+        .night-mode .checkbox-container input:checked {
+            background-color: rgba(0, 123, 255, 1); 
+            border-color: rgba(0, 123, 255, 1); 
+            box-shadow: 0 0 40px rgba(0, 123, 255, 1); 
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .night-mode {
+            background-image: url('Images/nightbg.gif');
+            color: rgb(22, 22, 60);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Parking Lot Garage</h1>
+
+        <h2>Enter Car Details</h2>
+        <form id="carForm">
+            <input type="text" id="carPlate" placeholder="Enter Car Plate" required>
+            <div class="checkbox-container">
+                <div>
+                    <input type="checkbox" id="carTypeArrival">
+                    <label for="carTypeArrival">Arrival</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="carTypeDeparture">
+                    <label for="carTypeDeparture">Departure</label>
+                </div>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+            <button type="submit">Add Car</button>
+        </form>
+
+        <label class="toggle">
+            <input type="checkbox" id="toggleMode">
+            <span class="slider"></span>
+        </label>
+        <div class="toggle-label" id="toggleLabel">Enter night mode?</div>
+
+        <div class="parking-lot" id="parkingLot">
+            <div class="car-stack" id="carStack"></div>
+        </div>
+
+        <h3>Car Arrival & Departure Summary</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cars Arrived</th>
+                        <th>Cars Departed</th>
+                    </tr>
+                </thead>
+                <tbody id="carLogTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const carForm = document.getElementById('carForm');
+        const carStack = document.getElementById('carStack');
+        const carLogTable = document.getElementById('carLogTable');
+        const toggleMode = document.getElementById('toggleMode');
+        const toggleLabel = document.getElementById('toggleLabel');
+        const body = document.body;
+
+        const arrivalCheckbox = document.getElementById('carTypeArrival');
+        const departureCheckbox = document.getElementById('carTypeDeparture');
+        const carPlateInput = document.getElementById('carPlate');
+        const errorMessage = document.getElementById('errorMessage');
+
+        let cars = [];
+
+        arrivalCheckbox.addEventListener('change', () => {
+            if (arrivalCheckbox.checked) {
+                departureCheckbox.checked = false;
+            }
+        });
+
+        departureCheckbox.addEventListener('change', () => {
+            if (departureCheckbox.checked) {
+                arrivalCheckbox.checked = false;
+            }
+        });
+
+        carForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            errorMessage.textContent = ''; 
+
+            const carPlate = carPlateInput.value.trim();
+            const isArrival = arrivalCheckbox.checked;
+            const isDeparture = departureCheckbox.checked;
+
+            if (!isArrival && !isDeparture) {
+                errorMessage.textContent = 'Please select either Arrival or Departure.';
+                return;
+            }
+
+            if (isArrival) {
+                if (cars.length >= 5) {
+                    carStack.firstElementChild.remove();
+                    cars.shift();
+                }
+
+                const carDiv = document.createElement('div');
+                carDiv.classList.add('car');
+
+                const carImageIndex = cars.length % 5 + 1; 
+                carDiv.style.backgroundImage = `url('Images/car${carImageIndex}.png')`;
+
+                const plateDiv = document.createElement('div');
+                plateDiv.classList.add('plate-number');
+                plateDiv.textContent = carPlate;
+                carDiv.appendChild(plateDiv);
+
+                carStack.append(carDiv);
+                cars.push(carPlate);
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `<td>1</td><td>0</td>`;
+                carLogTable.appendChild(newRow);
+            }
+
+            if (isDeparture) {
+                if (!cars.includes(carPlate)) {
+                    errorMessage.textContent = `Car with plate "${carPlate}" did not arrive.`;
+                return;
+                }
+
+                cars.splice(cars.indexOf(carPlate), 1);
+                carStack.lastElementChild.remove(); 
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `<td>0</td><td>1</td>`;
+                carLogTable.appendChild(newRow);
+            }
+
+            carPlateInput.value = '';
+            arrivalCheckbox.checked = false;
+            departureCheckbox.checked = false;
+        });
+
+        toggleMode.addEventListener('change', function() {
+            body.classList.toggle('night-mode');
+            toggleLabel.textContent = toggleMode.checked ? 'Enter Day Mode?' : 'Enter Night Mode?';
+        });
+    </script>
+</body>
+</html>
